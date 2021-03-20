@@ -231,7 +231,12 @@ public class MonRobot {
 				maison=maisons[i];
 			}
 		}
+		if(maison != null){
 		retourner(maison);
+		}
 		poser();
+		//aller à la position initiale
+		Navigator n = new Navigator(pilot);
+		n.goTo(0,0);
 	}
 }
