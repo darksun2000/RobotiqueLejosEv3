@@ -16,7 +16,9 @@
 * JEBLI Mohammed Amine
 * LAMRANI Ayoub
 * AIT ABDELOUAHAB Hamza
-* Les assistants.
+* M. Benhouriya Youness.
+* M. WAGA Abderahim.
+* M. BAICHOUR Ayoub.
 
 <a name="general-info"></a>
 ### Informations générales
