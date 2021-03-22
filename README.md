@@ -16,9 +16,9 @@
 * JEBLI Mohammed Amine
 * LAMRANI Ayoub
 * AIT ABDELOUAHAB Hamza
-* M. Benhouriya Youness.
+* M. Benhouria Younes.
 * M. WAGA Abderahim.
-* M. BAICHOUR Ayoub.
+* M. BAICHOU Ayoub.
 
 <a name="general-info"></a>
 ### Informations générales
