@@ -5,7 +5,7 @@ package classes;
 public class But {
 	
 	private Point point;
-	private int Couleur;
+	private int Couleur = -1;
 	
 	public But(Point point) {
 		this.point = point;

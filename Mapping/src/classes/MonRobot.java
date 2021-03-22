@@ -5,6 +5,7 @@ import lejos.hardware.motor.EV3MediumRegulatedMotor;
 import lejos.hardware.sensor.EV3ColorSensor;
 import lejos.hardware.sensor.EV3UltrasonicSensor;
 import lejos.robotics.SampleProvider;
+import lejos.robotics.localization.PoseProvider;
 import lejos.robotics.mapping.LineMap;
 import lejos.robotics.navigation.MoveController;
 import lejos.robotics.navigation.Navigator;
@@ -23,6 +24,7 @@ public class MonRobot {
 	// les moteurs du bras
 	private EV3MediumRegulatedMotor bMoteur;
 	private EV3MediumRegulatedMotor cMoteur;
+	private Navigator navigateur;
 
 	public MonRobot(MoveController pilot, LineMap carte, EV3UltrasonicSensor us, EV3ColorSensor cs,
 			EV3MediumRegulatedMotor bMoteur, EV3MediumRegulatedMotor cMoteur) {
@@ -32,6 +34,7 @@ public class MonRobot {
 		this.cs = cs;
 		this.bMoteur = bMoteur;
 		this.cMoteur = cMoteur;
+		this.navigateur = new Navigator(this.pilot);
 	}
 
 	public MoveController getPilot() {
@@ -82,29 +85,43 @@ public class MonRobot {
 		this.cMoteur = cMoteur;
 	}
 
-	
+
 	// methode pour aller vers un but
 	public void allerVers(But but) {
 		Point point = but.getPoint();
+		
 		// cree un objet Navigator a partir de notre pilote
-		Navigator navigateur = new Navigator(pilot);
+		float y = navigateur.getPoseProvider().getPose().getY();
 		// aller vers le point (x;0)
 		navigateur.goTo(point.getX(), 0);
-		while (pilot.isMoving());
-		// aller vers le point (x;y) ou se trouve le but
-		navigateur.goTo(point.getX(), point.getY());
 		Delay.msDelay(2000);
+		while(pilot.isMoving());
+		Delay.msDelay(2000);
+		while(pilot.isMoving());
+		// aller vers le point (x;y) ou se trouve le but
+		navigateur.goTo(point.getX(), point.getY() - 15);
+		Delay.msDelay(2000);
+		while(pilot.isMoving());
+		Delay.msDelay(2000);
+		while(pilot.isMoving());
 		// on verifie en meme temps que la distance est sup a 3 cm
 		float[] sample = new float[1];
 		SampleProvider sp = us.getDistanceMode();
+		pilot.setLinearAcceleration(50);
+		pilot.forward();
 		while (pilot.isMoving()) {
+			LCD.drawString(sample[0]+"", 0, 3);
+			y = navigateur.getPoseProvider().getPose().getY();
 			sp.fetchSample(sample, 0);
-			if (sample[0] <= 0.03) {
+			if (sample[0] <= 0.08 || y > point.getY() + 2) {
 				pilot.stop();
 				navigateur.stop();
 			}
 		}
+		pilot.setLinearAcceleration(20);
 	}
+	
+	
 	
 	//methode pour detection de la couleur du but
 	public void detecterCouleur(But but){
@@ -118,39 +135,39 @@ public class MonRobot {
 		case 1:
 			mes="GREEN";
 			break;
-			
+
 		case 2:
 			mes="BLUE";
 			break;
-			
+
 		case 3:
 			mes="YELLOW";
 			break;
-			
+
 		case 6:
 			mes="WHITE";
 			break;
-			
+
 		case 7:
 			mes="BLACK";
 			break;
-			
+
 		default:
 			LCD.drawString("UC ID = " + color, 0, 0);
 			Delay.msDelay(6000);
 			LCD.clear();
 		}//switch
+
 		
-		if(mes != null){
 			but.setCouleur(color);
-			LCD.drawString(mes , 0 ,0);
-		}
+			LCD.drawString(mes + "" , 0 ,0);
 		
+
 		Delay.msDelay(1000);
 		LCD.clear();
 
 	}
-	
+
 
 	//attraper un but
 	public void attraper() {
@@ -178,7 +195,7 @@ public class MonRobot {
 
 	//poser un but
 	public void poser() {
-		
+
 		cMoteur.rotate(-200);
 
 		while (cMoteur.isMoving()) {
@@ -203,40 +220,53 @@ public class MonRobot {
 
 		}
 	}
-	
+
 	//remettre le but vers la maison appropriee
-	void retourner(Maison maison){
+	void retourner(Maison maison,But but){
 		Point point = maison.getPoint();
+		Point pointBut = but.getPoint();
 		// cree un objet Navigator a partir de notre pilote
-		Navigator navigateur = new Navigator(pilot);
 		// aller vers le point (x;0)
-		navigateur.goTo(point.getX(), 0);
+		navigateur.goTo(pointBut.getX(), point.getY());
+		Delay.msDelay(2000);
+		while (pilot.isMoving());
+		Delay.msDelay(2000);
 		while (pilot.isMoving());
 		// aller vers le point (x;y) ou se trouve le but
 		navigateur.goTo(point.getX(), point.getY());
 		Delay.msDelay(2000);
 		while (pilot.isMoving());
+		Delay.msDelay(2000);
+		while (pilot.isMoving());
 	}
-	
+
 	//cette methode rassemble toutes les methodes
 	//elle sert a aller chercher le but donne et le remettre a sa masion appropriee
 	public void enchainement(But but,Maison maisons[]){
 		allerVers(but);
 		attraper();
 		detecterCouleur(but);
-		//cherhcer la masion appropier a la couleur du but
 		Maison maison = null;
 		for (int i = 0; i < maisons.length; i++) {
 			if(maisons[i].getCouleur() == but.getCouleur()){
 				maison=maisons[i];
+				break;
 			}
 		}
-		if(maison != null){
-		retourner(maison);
+		if(maison != null && but.getCouleur() != -1){
+			//cherhcer la masion appropier a la couleur du but
+			retourner(maison,but);
 		}
 		poser();
 		//aller à la position initiale
-		Navigator n = new Navigator(pilot);
-		n.goTo(0,0);
+		Maison maisonIntiale = new Maison(new Point(0,0),-1);
+		But monBut = null;
+		
+		pilot.backward();
+		Delay.msDelay(750);
+		pilot.stop();
+		if(maison != null) monBut = new But(new Point(navigateur.getPoseProvider().getPose().getX(),navigateur.getPoseProvider().getPose().getY()));
+		else monBut = but;
+		retourner(maisonIntiale,monBut);
 	}
 }
