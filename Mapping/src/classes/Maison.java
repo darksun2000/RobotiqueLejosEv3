@@ -6,9 +6,8 @@ public class Maison {
 	private Point point;
 	private int couleur;
 	
-	public Maison(Point point, int couleur) {
+	public Maison(Point point) {
 		this.point = point;
-		this.couleur = couleur;
 	}
 	public Point getPoint() {
 		return point;

@@ -1,17 +1,18 @@
 package classes;
 
+import Interfaces.MonRobotInterface;
+
 import lejos.hardware.lcd.LCD;
 import lejos.hardware.motor.EV3MediumRegulatedMotor;
 import lejos.hardware.sensor.EV3ColorSensor;
 import lejos.hardware.sensor.EV3UltrasonicSensor;
 import lejos.robotics.SampleProvider;
-import lejos.robotics.localization.PoseProvider;
 import lejos.robotics.mapping.LineMap;
 import lejos.robotics.navigation.MoveController;
 import lejos.robotics.navigation.Navigator;
 import lejos.utility.Delay;
 
-public class MonRobot {
+public class MonRobot implements MonRobotInterface {
 
 	// objet qui controlle le mvt du robot
 	private MoveController pilot;
@@ -21,17 +22,19 @@ public class MonRobot {
 	private EV3UltrasonicSensor us;
 	// le senseur des couleurs
 	private EV3ColorSensor cs;
+	private EV3ColorSensor csMaison;
 	// les moteurs du bras
 	private EV3MediumRegulatedMotor bMoteur;
 	private EV3MediumRegulatedMotor cMoteur;
 	private Navigator navigateur;
 
 	public MonRobot(MoveController pilot, LineMap carte, EV3UltrasonicSensor us, EV3ColorSensor cs,
-			EV3MediumRegulatedMotor bMoteur, EV3MediumRegulatedMotor cMoteur) {
+			EV3MediumRegulatedMotor bMoteur, EV3MediumRegulatedMotor cMoteur, EV3ColorSensor csMaison) {
 		this.pilot = pilot;
 		this.carte = carte;
 		this.us = us;
 		this.cs = cs;
+		this.csMaison = csMaison;
 		this.bMoteur = bMoteur;
 		this.cMoteur = cMoteur;
 		this.navigateur = new Navigator(this.pilot);
@@ -91,7 +94,7 @@ public class MonRobot {
 		Point point = but.getPoint();
 		
 		// cree un objet Navigator a partir de notre pilote
-		float y = navigateur.getPoseProvider().getPose().getY();
+		double y = navigateur.getPoseProvider().getPose().getY();
 		// aller vers le point (x;0)
 		navigateur.goTo(point.getX(), 0);
 		Delay.msDelay(2000);
@@ -222,7 +225,7 @@ public class MonRobot {
 	}
 
 	//remettre le but vers la maison appropriee
-	void retourner(Maison maison,But but){
+	public void retourner(Maison maison,But but){
 		Point point = maison.getPoint();
 		Point pointBut = but.getPoint();
 		// cree un objet Navigator a partir de notre pilote
@@ -257,16 +260,51 @@ public class MonRobot {
 			//cherhcer la masion appropier a la couleur du but
 			retourner(maison,but);
 		}
-		poser();
-		//aller à la position initiale
-		Maison maisonIntiale = new Maison(new Point(0,0),-1);
-		But monBut = null;
-		
+		poser();		
 		pilot.backward();
 		Delay.msDelay(750);
 		pilot.stop();
-		if(maison != null) monBut = new But(new Point(navigateur.getPoseProvider().getPose().getX(),navigateur.getPoseProvider().getPose().getY()));
-		else monBut = but;
-		retourner(maisonIntiale,monBut);
+	}
+	
+	public void decouvrir(Maison[] maisons){
+		int couleur = -1;
+		for (int i = 0; i < maisons.length; i++) {
+			navigateur.goTo(maisons[i].getPoint().getX(),0);
+			Delay.msDelay(2000);
+			while (pilot.isMoving());
+			Delay.msDelay(2000);
+			while (pilot.isMoving());
+			
+			navigateur.goTo(maisons[i].getPoint().getX(), maisons[i].getPoint().getY());
+			Delay.msDelay(2000);
+			while (pilot.isMoving());
+			Delay.msDelay(2000);
+			while (pilot.isMoving());
+			couleur = csMaison.getColorID();
+			maisons[i].setCouleur(couleur);
+		}			
+	}
+
+	@Override
+	public But ButProche(But[] buts) {
+		// TODO Auto-generated method stub
+		double x = navigateur.getPoseProvider().getPose().getX();
+		double y = navigateur.getPoseProvider().getPose().getX();
+		double xb = buts[0].getPoint().getX();
+		double yb = buts[0].getPoint().getY();
+		double min = Math.sqrt(Math.pow((x-xb),2)+Math.pow((y-yb),2));
+		double distance = 0;
+		int indiceBut = 0;
+		
+		for (int i = 1; i < buts.length; i++) {
+			xb = buts[i].getPoint().getX();
+			yb = buts[i].getPoint().getY();
+			distance = Math.sqrt(Math.pow((x-xb),2)+Math.pow((y-yb),2));
+			if (distance<min){
+				min = distance;
+				indiceBut = i;
+			}
+		}
+		return buts[indiceBut];
 	}
 }
