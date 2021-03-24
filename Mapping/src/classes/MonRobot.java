@@ -1,7 +1,7 @@
 package classes;
 
 import Interfaces.MonRobotInterface;
-
+import lejos.hardware.Button;
 import lejos.hardware.lcd.LCD;
 import lejos.hardware.motor.EV3MediumRegulatedMotor;
 import lejos.hardware.sensor.EV3ColorSensor;
@@ -12,6 +12,20 @@ import lejos.robotics.navigation.MoveController;
 import lejos.robotics.navigation.Navigator;
 import lejos.utility.Delay;
 
+/**
+ * implementation de l'interface {@code MonRobotInterface}
+ * qui prend en considération le robot ayant deux roues, une main, deux capteurs couleurs;
+ * la première pour détecter la couleur de l'object dans la positionl du but,
+ * et l'autre pour détecter la couleur de la surface de la maison.
+ * @author Khalid Naimi
+ * @see MonRobotInterface
+ * @see MoveController
+ * @see LineMap
+ * @see EV3UltrasonicSensor
+ * @see EV3ColorSensor
+ * @see Ev3MediumRegulatedMotor
+ * @see Navigator 
+ */
 public class MonRobot implements MonRobotInterface {
 
 	// objet qui controlle le mvt du robot
@@ -89,7 +103,12 @@ public class MonRobot implements MonRobotInterface {
 	}
 
 
-	// methode pour aller vers un but
+	/**
+	 * methode pour aller vers un but
+	 * @return
+	 * @param but
+	 */
+	@Override
 	public void allerVers(But but) {
 		Point point = but.getPoint();
 		
@@ -126,7 +145,10 @@ public class MonRobot implements MonRobotInterface {
 	
 	
 	
-	//methode pour detection de la couleur du but
+	/**
+	 * methode pour detection de la couleur du but
+	 */
+	@Override
 	public void detecterCouleur(But but){
 		String mes = null;
 		int color = cs.getColorID();
@@ -172,7 +194,10 @@ public class MonRobot implements MonRobotInterface {
 	}
 
 
-	//attraper un but
+	/**
+	 * methode pour attraper un but avec la main
+	 */
+	@Override
 	public void attraper() {
 		bMoteur.setSpeed(2500);
 		bMoteur.rotate(1000);
@@ -196,7 +221,10 @@ public class MonRobot implements MonRobotInterface {
 
 	}
 
-	//poser un but
+	/**
+	 * methode pour poser un object provenant d'un but
+	 */
+	@Override
 	public void poser() {
 
 		cMoteur.rotate(-200);
@@ -224,7 +252,13 @@ public class MonRobot implements MonRobotInterface {
 		}
 	}
 
-	//remettre le but vers la maison appropriee
+	/**
+	 * methode pour remettre le but vers la maison appropriée
+	 * @return
+	 * @param maison
+	 * @param but
+	 */
+	@Override
 	public void retourner(Maison maison,But but){
 		Point point = maison.getPoint();
 		Point pointBut = but.getPoint();
@@ -241,10 +275,14 @@ public class MonRobot implements MonRobotInterface {
 		while (pilot.isMoving());
 		Delay.msDelay(2000);
 		while (pilot.isMoving());
+		
 	}
 
-	//cette methode rassemble toutes les methodes
-	//elle sert a aller chercher le but donne et le remettre a sa masion appropriee
+	/**
+	 * cette methode rassemble toutes le methodes
+	 * elle sert à aller chercher le but donné et le remettre à sa maison appropriée
+	 */
+	@Override
 	public void enchainement(But but,Maison maisons[]){
 		allerVers(but);
 		attraper();
@@ -259,17 +297,22 @@ public class MonRobot implements MonRobotInterface {
 		if(maison != null && but.getCouleur() != -1){
 			//cherhcer la masion appropier a la couleur du but
 			retourner(maison,but);
+			navigateur.rotateTo(maison.getAngle());
 		}
 		poser();		
 		pilot.backward();
 		Delay.msDelay(750);
 		pilot.stop();
 	}
-	
+	/**
+	 * méthode pour détecter la couleur de la surface de chaque maison
+	 */
+	@Override
 	public void decouvrir(Maison[] maisons){
 		int couleur = -1;
+		float x, y;
 		for (int i = 0; i < maisons.length; i++) {
-			navigateur.goTo(maisons[i].getPoint().getX(),0);
+			navigateur.goTo(maisons[i].getPoint().getX(),navigateur.getPoseProvider().getPose().getY());
 			Delay.msDelay(2000);
 			while (pilot.isMoving());
 			Delay.msDelay(2000);
@@ -280,14 +323,24 @@ public class MonRobot implements MonRobotInterface {
 			while (pilot.isMoving());
 			Delay.msDelay(2000);
 			while (pilot.isMoving());
+			LCD.drawString("Maison numéros : " + i, 0, 0);
+			x = navigateur.getPoseProvider().getPose().getX();
+			y = navigateur.getPoseProvider().getPose().getY();
+			LCD.drawString("Position: (" + x + ", " + y + ")", 0, 1);
+			LCD.drawString("Appuiez sur un bouton", 0, 2);
+			while(Button.getButtons() == 0);
 			couleur = csMaison.getColorID();
 			maisons[i].setCouleur(couleur);
+			maisons[i].setAngle(navigateur.getPoseProvider().getPose().getHeading());
 		}			
 	}
 
+	/**
+	 * méthode utilisé pour la prise de décision en fonction du chemein le plus cours entre le robot
+	 * et les buts donnés en parametre
+	 */
 	@Override
 	public But ButProche(But[] buts) {
-		// TODO Auto-generated method stub
 		double x = navigateur.getPoseProvider().getPose().getX();
 		double y = navigateur.getPoseProvider().getPose().getX();
 		double xb = buts[0].getPoint().getX();

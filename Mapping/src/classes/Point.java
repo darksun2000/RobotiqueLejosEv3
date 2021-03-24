@@ -1,5 +1,9 @@
 package classes;
-
+/**
+ * classe simple utilisé pour les coordonnées cartésienne à deux dimension, soient les valeurs x et y
+ * @author Khalid Naimi
+ *
+ */
 public class Point {
 	
 	private float x,y;
