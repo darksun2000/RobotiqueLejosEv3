@@ -52,6 +52,7 @@ public class MonRobot implements MonRobotInterface {
 		this.bMoteur = bMoteur;
 		this.cMoteur = cMoteur;
 		this.navigateur = new Navigator(this.pilot);
+		
 	}
 
 	public MoveController getPilot() {
@@ -113,15 +114,15 @@ public class MonRobot implements MonRobotInterface {
 		Point point = but.getPoint();
 		
 		// cree un objet Navigator a partir de notre pilote
-		double y = navigateur.getPoseProvider().getPose().getY();
+		float y = navigateur.getPoseProvider().getPose().getY();
 		// aller vers le point (x;0)
-		navigateur.goTo(point.getX(), 0);
+		navigateur.goTo(point.getX(), y);
 		Delay.msDelay(2000);
 		while(pilot.isMoving());
 		Delay.msDelay(2000);
 		while(pilot.isMoving());
 		// aller vers le point (x;y) ou se trouve le but
-		navigateur.goTo(point.getX(), point.getY() - 15);
+		navigateur.goTo(point.getX(), point.getY() - 15 );
 		Delay.msDelay(2000);
 		while(pilot.isMoving());
 		Delay.msDelay(2000);
@@ -129,7 +130,6 @@ public class MonRobot implements MonRobotInterface {
 		// on verifie en meme temps que la distance est sup a 3 cm
 		float[] sample = new float[1];
 		SampleProvider sp = us.getDistanceMode();
-		pilot.setLinearAcceleration(50);
 		pilot.forward();
 		while (pilot.isMoving()) {
 			LCD.drawString(sample[0]+"", 0, 3);
@@ -140,7 +140,6 @@ public class MonRobot implements MonRobotInterface {
 				navigateur.stop();
 			}
 		}
-		pilot.setLinearAcceleration(20);
 	}
 	
 	
@@ -317,20 +316,60 @@ public class MonRobot implements MonRobotInterface {
 			while (pilot.isMoving());
 			Delay.msDelay(2000);
 			while (pilot.isMoving());
-			
 			navigateur.goTo(maisons[i].getPoint().getX(), maisons[i].getPoint().getY());
 			Delay.msDelay(2000);
 			while (pilot.isMoving());
 			Delay.msDelay(2000);
 			while (pilot.isMoving());
+
 			LCD.drawString("Maison numéros : " + i, 0, 0);
 			x = navigateur.getPoseProvider().getPose().getX();
 			y = navigateur.getPoseProvider().getPose().getY();
 			LCD.drawString("Position: (" + x + ", " + y + ")", 0, 1);
 			LCD.drawString("Appuiez sur un bouton", 0, 2);
-			while(Button.getButtons() == 0);
+			LCD.clear();
 			couleur = csMaison.getColorID();
+			LCD.drawString("Maison numéros : " + i, 0, 0);
+			String mes = null;
+			switch (couleur){
+			case 0:
+				mes="RED";
+				break;
+
+			case 1:
+				mes="GREEN";
+				break;
+
+			case 2:
+				mes="BLUE";
+				break;
+
+			case 3:
+				mes="YELLOW";
+				break;
+
+			case 6:
+				mes="WHITE";
+				break;
+
+			case 7:
+				mes="BLACK";
+				break;
+
+			default:
+				LCD.drawString("UC ID = " + couleur, 0, 1);
+			}//switch
+			if(mes != null)
+				LCD.drawString(mes, 0, 1);
+			
+			LCD.drawString("Appuiez sur un bouton", 0, 2);
+			
+			//modification des coordonnées de la maison
 			maisons[i].setCouleur(couleur);
+			Point pointDecale = maisons[i].getPoint();
+			pointDecale.setX((float) (pointDecale.getX() + 6.5));
+			maisons[i].setPoint(pointDecale);
+			
 			maisons[i].setAngle(navigateur.getPoseProvider().getPose().getHeading());
 		}			
 	}

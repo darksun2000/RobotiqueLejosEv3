@@ -36,17 +36,17 @@ public class Robotique {
 		Robotique traveler = new Robotique();
 
 		// creer les maisons
-		Maison[] maisons = new Maison[4];
-		maisons[0] = new Maison(new Point(100, 20));
-		maisons[1] = new Maison(new Point(100, 40));
-		maisons[2] = new Maison(new Point(100, 60));
-		maisons[3] = new Maison(new Point(100, 80));
+		Maison[] maisons = new Maison[3];
+		maisons[0] = new Maison(new Point(100, 7));
+		maisons[1] = new Maison(new Point(100, 27));
+		maisons[2] = new Maison(new Point(100, 47));
+//		maisons[3] = new Maison(new Point(100, 80));
 
 		// creer les buts
-		But[] buts = new But[1];
+		But[] buts = new But[3];
 		buts[0] = new But(new Point(50, 50));
-//		buts[1] = new But(new Point(50, 0));
-//		buts[2] = new But(new Point(100, 90));
+		buts[1] = new But(new Point(50, 0));
+		buts[2] = new But(new Point(50, 40));
 //		buts[3] = new But(new Point(90, 40));
 //		buts[4] = new But(new Point(60, 80));
 //		buts[5] = new But(new Point(80, 50));
@@ -63,13 +63,12 @@ public class Robotique {
 		rightMotor = new EV3LargeRegulatedMotor(MotorPort.D);
 		EV3MediumRegulatedMotor bMotor = new EV3MediumRegulatedMotor(MotorPort.B);
 		EV3MediumRegulatedMotor cMotor = new EV3MediumRegulatedMotor(MotorPort.C);
-		traveler.pilot = new DifferentialPilot(5.6f, 11.2f, leftMotor, rightMotor);
+		traveler.pilot = new DifferentialPilot(5.6f, 10.9f, leftMotor, rightMotor);
 		traveler.pilot.setLinearSpeed(15);
-		traveler.pilot.setLinearAcceleration(20);
 
 		// creer le robot
 		MonRobot robot = new MonRobot(traveler.pilot, lm, us, cs, bMotor, cMotor, csMaison);
-
+		traveler.pilot.setLinearAcceleration(30);
 		//declenchement de la mission du robot
 		traveler.go(lm, maisons, buts, robot);
 	}
