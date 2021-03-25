@@ -11,6 +11,14 @@ import classes.Maison;
  * la position du capteur, etc.
  * 
  * @author Khalid Naimi
+ * @author Salah El Mesbahi
+ * @author Ayoub Lamrani
+ * @author Oussama Bekbichi
+ * @author Safouan El-Ryfy
+ * @author Aymane Berrhoze
+ * @author Mohammed Amine Jebli
+ * @author Hamza Ait Abdelouahab
+ * @author Maha El Garce
  * @see But
  * @see Maison
  *

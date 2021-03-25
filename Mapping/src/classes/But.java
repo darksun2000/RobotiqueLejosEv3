@@ -11,6 +11,14 @@ package classes;
  * l'une de type {@code Point} et la deuxième nommé Couleur de type {@code int}
  * 
  * @author Khalid Naimi
+ * @author Salah El Mesbahi
+ * @author Ayoub Lamrani
+ * @author Oussama Bekbichi
+ * @author Safouan El-Ryfy
+ * @author Aymane Berrhoze
+ * @author Mohammed Amine Jebli
+ * @author Hamza Ait Abdelouahab
+ * @author Maha El Garce
  * @see Maison
  * @see Point
  */

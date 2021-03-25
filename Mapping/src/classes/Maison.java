@@ -5,6 +5,14 @@ package classes;
  * l'objet provenant de la position indicé dans l'object de type {@code But}
  * 
  * @author Khalid Naimi
+ * @author Salah El Mesbahi
+ * @author Ayoub Lamrani
+ * @author Oussama Bekbichi
+ * @author Safouan El-Ryfy
+ * @author Aymane Berrhoze
+ * @author Mohammed Amine Jebli
+ * @author Hamza Ait Abdelouahab
+ * @author Maha El Garce
  * @see Point
  * @see But
  */
