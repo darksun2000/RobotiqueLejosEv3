@@ -37,16 +37,16 @@ public class Robotique {
 
 		// creer les maisons
 		Maison[] maisons = new Maison[3];
-		maisons[0] = new Maison(new Point(100, 7));
-		maisons[1] = new Maison(new Point(100, 27));
-		maisons[2] = new Maison(new Point(100, 47));
+		maisons[0] = new Maison(new Point(105, 7));
+		maisons[1] = new Maison(new Point(105, 63));
+		maisons[2] = new Maison(new Point(10, 62));
 //		maisons[3] = new Maison(new Point(100, 80));
 
 		// creer les buts
 		But[] buts = new But[3];
 		buts[0] = new But(new Point(50, 50));
-		buts[1] = new But(new Point(50, 0));
-		buts[2] = new But(new Point(50, 40));
+		buts[1] = new But(new Point(75, 55));
+		buts[2] = new But(new Point(10, 35));
 //		buts[3] = new But(new Point(90, 40));
 //		buts[4] = new But(new Point(60, 80));
 //		buts[5] = new But(new Point(80, 50));
@@ -79,9 +79,8 @@ public class Robotique {
 		robot.decouvrir(maisons);
 		
 		for (int i = 0; i < buts.length; i++) {
-			But but = robot.ButProche(buts);
 			
-			robot.enchainement(but, maisons);
+			robot.enchainement(buts[i], maisons);
 		}
 		
 	}

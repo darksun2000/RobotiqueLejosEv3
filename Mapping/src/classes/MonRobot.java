@@ -135,7 +135,7 @@ public class MonRobot implements MonRobotInterface {
 			LCD.drawString(sample[0]+"", 0, 3);
 			y = navigateur.getPoseProvider().getPose().getY();
 			sp.fetchSample(sample, 0);
-			if (sample[0] <= 0.08 || y > point.getY() + 2) {
+			if (sample[0] <= 0.09 || y > point.getY() + 2) {
 				pilot.stop();
 				navigateur.stop();
 			}
@@ -321,7 +321,7 @@ public class MonRobot implements MonRobotInterface {
 			while (pilot.isMoving());
 			Delay.msDelay(2000);
 			while (pilot.isMoving());
-
+			navigateur.getPoseProvider().getPose().setLocation(maisons[i].getPoint().getX(), maisons[i].getPoint().getY());
 			LCD.drawString("Maison numéros : " + i, 0, 0);
 			x = navigateur.getPoseProvider().getPose().getX();
 			y = navigateur.getPoseProvider().getPose().getY();
