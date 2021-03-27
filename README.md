@@ -26,9 +26,9 @@
 Dans ce projet, on a utilisé un robot LEGO EV3 et on l'a programmé en langage JAVA.<br>
 Ce projet consiste à :
 - Construire et programmer un robot qui puisse se déplacer dans un environnement.
+- Le robot doit d'abord détecter les bacs et connaître leurs couleurs.
+- Il existe des bacs pour chaque couleur (bleu, rouge, vert, jaune).
 - Lorsque le robot rencontre un objet, il doit identifier sa couleur puis transporter l’objet dans le bac adéquat.
-- Il existe des bacs pour chaque couleur (bleu, rouge, vert...).
-- Le robot ne connaît pas les emplacements des objets ni ceux des bacs. Il doit donc se localiser et prendre des décisions tout seul.
 
 <a name="technologies"></a>
 ### Technologies
