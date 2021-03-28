@@ -2,7 +2,7 @@ package classes;
 
 /**
  * C'est la classe déterminante de l'objectif du robot ou aller pour pose
- * l'objet provenant de la position indicé dans l'object de type {@code But}
+ * l'objet provenant de la position indiquée dans l'object de type {@code But}
  * 
  * @author Khalid Naimi
  * @author Salah El Mesbahi

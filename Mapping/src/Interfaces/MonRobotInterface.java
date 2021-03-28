@@ -1,5 +1,7 @@
 package Interfaces;
 
+import java.util.List;
+
 import classes.But;
 import classes.Maison;
 /**
@@ -30,8 +32,11 @@ public interface MonRobotInterface {
 	public void attraper();
 	public void poser();
 	public void retourner(Maison maison,But but);
-	public void enchainement(But but,Maison maisons[]);
-	public void decouvrir(Maison[] maisons);
-	public But ButProche(But[] buts);
+	public void enchainement(But but,List<Maison> maisons);
+	public void decouvrir(List<Maison> maisons);
+	public void afficherCouleur(int idCouleur);
+	public But ButProche(List<But> buts);
+	public void insisterDetectionCouleur(But but);
+	public Maison chercherMaisonCorrespondante(But but,List<Maison> maisons);
 	
 }
