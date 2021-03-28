@@ -37,16 +37,16 @@ public class Robotique {
 
 		// creer les maisons
 		Maison[] maisons = new Maison[3];
-		maisons[0] = new Maison(new Point(105, 7));
-		maisons[1] = new Maison(new Point(105, 63));
-		maisons[2] = new Maison(new Point(10, 62));
+		maisons[0] = new Maison(new Point(98, 23));
+		maisons[1] = new Maison(new Point(104, 64));
+		maisons[2] = new Maison(new Point(12, 67));
 //		maisons[3] = new Maison(new Point(100, 80));
 
 		// creer les buts
-		But[] buts = new But[3];
-		buts[0] = new But(new Point(50, 50));
-		buts[1] = new But(new Point(75, 55));
-		buts[2] = new But(new Point(10, 35));
+		But[] buts = new But[1];
+		buts[0] = new But(new Point(50, 65));
+		//buts[1] = new But(new Point(50, 50));
+		//buts[2] = new But(new Point(40, 40));
 //		buts[3] = new But(new Point(90, 40));
 //		buts[4] = new But(new Point(60, 80));
 //		buts[5] = new But(new Point(80, 50));

@@ -115,12 +115,7 @@ public class MonRobot implements MonRobotInterface {
 		
 		// cree un objet Navigator a partir de notre pilote
 		float y = navigateur.getPoseProvider().getPose().getY();
-		// aller vers le point (x;0)
-		navigateur.goTo(point.getX(), y);
-		Delay.msDelay(2000);
-		while(pilot.isMoving());
-		Delay.msDelay(2000);
-		while(pilot.isMoving());
+		
 		// aller vers le point (x;y) ou se trouve le but
 		navigateur.goTo(point.getX(), point.getY() - 15 );
 		Delay.msDelay(2000);
@@ -131,15 +126,17 @@ public class MonRobot implements MonRobotInterface {
 		float[] sample = new float[1];
 		SampleProvider sp = us.getDistanceMode();
 		pilot.forward();
+		pilot.setLinearSpeed(7);
 		while (pilot.isMoving()) {
 			LCD.drawString(sample[0]+"", 0, 3);
 			y = navigateur.getPoseProvider().getPose().getY();
 			sp.fetchSample(sample, 0);
-			if (sample[0] <= 0.09 || y > point.getY() + 2) {
+			if (sample[0] <= 0.06 || y > point.getY() + 2) {
 				pilot.stop();
 				navigateur.stop();
 			}
 		}
+		pilot.setLinearSpeed(15);
 	}
 	
 	
@@ -260,14 +257,7 @@ public class MonRobot implements MonRobotInterface {
 	@Override
 	public void retourner(Maison maison,But but){
 		Point point = maison.getPoint();
-		Point pointBut = but.getPoint();
-		// cree un objet Navigator a partir de notre pilote
-		// aller vers le point (x;0)
-		navigateur.goTo(pointBut.getX(), point.getY());
-		Delay.msDelay(2000);
-		while (pilot.isMoving());
-		Delay.msDelay(2000);
-		while (pilot.isMoving());
+
 		// aller vers le point (x;y) ou se trouve le but
 		navigateur.goTo(point.getX(), point.getY());
 		Delay.msDelay(2000);
@@ -284,8 +274,46 @@ public class MonRobot implements MonRobotInterface {
 	@Override
 	public void enchainement(But but,Maison maisons[]){
 		allerVers(but);
-		attraper();
-		detecterCouleur(but);
+		do{			
+			attraper();
+			detecterCouleur(but);
+			if(but.getCouleur() != 13 && but.getCouleur() != -1)break;
+			poser();
+			pilot.backward();
+			pilot.setLinearSpeed(7);
+			Delay.msDelay(300);
+			pilot.stop();
+			attraper();
+			detecterCouleur(but);
+			if(but.getCouleur() != 13 && but.getCouleur() != -1){
+				pilot.setLinearSpeed(15);
+				break;
+			}
+			poser();
+			pilot.forward();
+			pilot.setLinearSpeed(7);
+			Delay.msDelay(600);
+			pilot.stop();
+			attraper();
+			detecterCouleur(but);
+			if(but.getCouleur() != 13 && but.getCouleur() != -1){
+				pilot.setLinearSpeed(15);
+				break;
+			}
+			poser();
+			pilot.backward();
+			pilot.setLinearSpeed(7);
+			Delay.msDelay(300);
+			pilot.stop();
+			attraper();
+			detecterCouleur(but);
+			if(but.getCouleur() != 13 && but.getCouleur() != -1){
+				pilot.setLinearSpeed(15);
+				break;
+			}
+		}while(but.getCouleur() == 13 || but.getCouleur() == -1);
+		LCD.drawString("Couleur du but = " + but.getCouleur(), 0, 1);
+
 		Maison maison = null;
 		for (int i = 0; i < maisons.length; i++) {
 			if(maisons[i].getCouleur() == but.getCouleur()){
@@ -296,7 +324,7 @@ public class MonRobot implements MonRobotInterface {
 		if(maison != null && but.getCouleur() != -1){
 			//cherhcer la masion appropier a la couleur du but
 			retourner(maison,but);
-			navigateur.rotateTo(maison.getAngle());
+			//navigateur.rotateTo(maison.getAngle());
 		}
 		poser();		
 		pilot.backward();
@@ -311,11 +339,7 @@ public class MonRobot implements MonRobotInterface {
 		int couleur = -1;
 		float x, y;
 		for (int i = 0; i < maisons.length; i++) {
-			navigateur.goTo(maisons[i].getPoint().getX(),navigateur.getPoseProvider().getPose().getY());
-			Delay.msDelay(2000);
-			while (pilot.isMoving());
-			Delay.msDelay(2000);
-			while (pilot.isMoving());
+			
 			navigateur.goTo(maisons[i].getPoint().getX(), maisons[i].getPoint().getY());
 			Delay.msDelay(2000);
 			while (pilot.isMoving());
