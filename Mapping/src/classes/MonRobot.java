@@ -112,11 +112,14 @@ public class MonRobot implements MonRobotInterface {
     @Override
     public void allerVers(But but) {
         Point point = but.getPoint();
-
+        float x = navigateur.getPoseProvider().getPose().getX();
         float y = navigateur.getPoseProvider().getPose().getY();
+        Point pointRobot = new Point(x,y);
+        double teta = getAngleEntreDeuxPoints(point, pointRobot);
 
         // aller vers le point (x;y) ou se trouve le but
-        navigateur.goTo(point.getX(), point.getY() - 15);
+        navigateur.goTo(point.getX() + 10*(float)Math.cos(teta + Math.PI), point.getY() - 10*(float)Math.sin(teta + Math.PI));
+        
         Delay.msDelay(2000);
         while (pilot.isMoving());
         Delay.msDelay(2000);
@@ -124,8 +127,8 @@ public class MonRobot implements MonRobotInterface {
         // on verifie en meme temps que la distance est sup a 3 cm
         float[] sample = new float[1];
         SampleProvider sp = us.getDistanceMode();
-        pilot.forward();
         pilot.setLinearSpeed(7);
+        pilot.forward();
         while (pilot.isMoving()) {
             LCD.drawString(sample[0] + "", 0, 3);
             y = navigateur.getPoseProvider().getPose().getY();
@@ -145,7 +148,7 @@ public class MonRobot implements MonRobotInterface {
     public void detecterCouleur(But but) {
         int color = cs.getColorID();
         afficherCouleur(color);
-
+        but.setCouleur(color);
     }
 
     /**
@@ -209,7 +212,6 @@ public class MonRobot implements MonRobotInterface {
         while (pilot.isMoving());
         Delay.msDelay(2000);
         while (pilot.isMoving());
-
     }
 
     /**
@@ -231,7 +233,8 @@ public class MonRobot implements MonRobotInterface {
         if (maison != null && but.getCouleur() != -1) {
             
             retourner(maison, but);
-            //navigateur.rotateTo(maison.getAngle());
+//            navigateur.rotateTo(maison.getAngle());
+            insisterPoserObjet(maison);
             poser();
             pilot.backward();
             Delay.msDelay(750);
@@ -262,6 +265,9 @@ public class MonRobot implements MonRobotInterface {
             LCD.drawString("Position: (" + x + ", " + y + ")", 0, 1);
             LCD.drawString("Appuiez sur un bouton", 0, 2);
             LCD.clear();
+            couleur = csMaison.getColorID();
+            if(couleur == -1 || couleur == 6)
+            	insisterCouleurMaison();
             couleur = csMaison.getColorID();
             afficherCouleur(couleur);
 
@@ -346,8 +352,14 @@ public class MonRobot implements MonRobotInterface {
 
         pilot.setLinearSpeed(5);
         float[] sample = new float[1];
-
+        SampleProvider sp = us.getDistanceMode();
+        sp.fetchSample(sample, 0);
+        pilot.forward();
+        while(sample[0] < .06)
+        	sp.fetchSample(sample, 0);
+        pilot.stop();
         do {
+        	
             attraper();
             detecterCouleur(but);
             if (but.getCouleur() == 13 || but.getCouleur() == -1)
@@ -355,10 +367,9 @@ public class MonRobot implements MonRobotInterface {
             else
                 break;
 
-            SampleProvider sp = us.getDistanceMode();
             sp.fetchSample(sample, 0);
 
-            if (sample[0] < 0.06) {
+            if (sample[0] < 0.06 || sample[0] > 1000 || sample[0] < -1000) {
                 pilot.backward();
                 while (pilot.isMoving()) {
                     LCD.drawString(sample[0] + "", 0, 3);
@@ -368,7 +379,7 @@ public class MonRobot implements MonRobotInterface {
                         navigateur.stop();
                     }
                 }
-            } else if (sample[0] > 0.06) {
+            } else if (sample[0] > 0.06 || sample[0] == Float.POSITIVE_INFINITY) {
                 pilot.forward();
                 while (pilot.isMoving()) {
                     LCD.drawString(sample[0] + "", 0, 3);
@@ -394,4 +405,48 @@ public class MonRobot implements MonRobotInterface {
         }
         return maison;
     }
+    /**
+     * angle en degree
+     * @param pBut
+     * @param pRobot
+     * @return
+     */
+    public double getAngleEntreDeuxPoints(Point pBut, Point pRobot){
+    	double a = Math.abs(pBut.getY() - pRobot.getY());
+    	double aprime = pRobot.getY() - pBut.getY();
+    	double b = Math.abs(pBut.getX() - pRobot.getX());
+    	double bprime = pRobot.getX() - pBut.getX();
+    	double c = Math.sqrt(a*a + b*b);
+    	double cos_teta = b/c;
+    	double teta = Math.acos(cos_teta);
+    	if(bprime > 0 && aprime > 0){
+    		teta = Math.abs(teta);
+    	}else if (bprime < 0 && aprime > 0){
+    		teta = Math.abs(teta);
+    	}else if (bprime > 0 && aprime < 0){
+    		teta = -Math.abs(teta);
+    	}else{
+    		teta = -Math.abs(teta);
+    	}
+    	
+    	return teta;
+    }
+    
+    public void insisterPoserObjet(Maison maison){
+    	int couleur = maison.getCouleur();
+    	for(int i = 0; i<360; i+=10){
+    		if(csMaison.getColorID() == couleur)break;
+    		else navigateur.rotateTo(i);
+    		}
+    		
+    	}
+    	
+    	public void insisterCouleurMaison(){
+        	for(int i = 0; i<360; i+=10){
+        		if(csMaison.getColorID() != -1 && csMaison.getColorID() != 6)break;
+        		else navigateur.rotateTo(i);
+        	}
+        	navigateur.rotateTo(18);
+    }
+    
 }

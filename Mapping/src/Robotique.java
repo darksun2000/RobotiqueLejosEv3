@@ -16,6 +16,7 @@ import lejos.hardware.motor.EV3MediumRegulatedMotor;
 import lejos.hardware.port.MotorPort;
 import lejos.hardware.port.SensorPort;
 import lejos.hardware.sensor.EV3ColorSensor;
+import lejos.hardware.sensor.EV3GyroSensor;
 import lejos.hardware.sensor.EV3UltrasonicSensor;
 import lejos.robotics.localization.PoseProvider;
 import lejos.robotics.mapping.LineMap;
@@ -47,7 +48,7 @@ public class Robotique {
         // creer les buts
         List < But > buts = new ArrayList < But > ();
         buts.add(new But(new Point(50, 65)));
-        //buts.add(new But(new Point(50, 50)));
+        buts.add(new But(new Point(20, 50)));
         //buts.add(new But(new Point(40, 40)));
         //buts.add(new But(new Point(90, 40)));
         //buts.add(new But(new Point(60, 80)));
@@ -60,7 +61,8 @@ public class Robotique {
         EV3UltrasonicSensor us = new EV3UltrasonicSensor(SensorPort.S2);
         EV3ColorSensor cs = new EV3ColorSensor(SensorPort.S1);
         EV3ColorSensor csMaison = new EV3ColorSensor(SensorPort.S3);
-
+        EV3GyroSensor gs = new EV3GyroSensor(SensorPort.S4);
+        
         leftMotor = new EV3LargeRegulatedMotor(MotorPort.A);
         rightMotor = new EV3LargeRegulatedMotor(MotorPort.D);
         EV3MediumRegulatedMotor bMotor = new EV3MediumRegulatedMotor(MotorPort.B);
@@ -68,6 +70,9 @@ public class Robotique {
         traveler.pilot = new DifferentialPilot(5.6f, 10.9f, leftMotor, rightMotor);
         traveler.pilot.setLinearSpeed(15);
 
+        //
+        gs.reset();
+        
         // creer le robot
         MonRobot robot = new MonRobot(traveler.pilot, lm, us, cs, bMotor, cMotor, csMaison);
         traveler.pilot.setLinearAcceleration(30);
@@ -78,13 +83,11 @@ public class Robotique {
     // methode declenche la mission du robot
     public void go(LineMap lm, List < Maison > maisons, List < But > buts, MonRobot robot) {
         robot.decouvrir(maisons);
-
-        But but = robot.ButProche(buts);
-        do {
+        But but;
+        while (!buts.isEmpty()){
+        	but = robot.ButProche(buts);        	
             robot.enchainement(but, maisons);
-            if (!buts.isEmpty())
-                but = robot.ButProche(buts);
-        } while (!buts.isEmpty());
+        } 
 
     }
 
